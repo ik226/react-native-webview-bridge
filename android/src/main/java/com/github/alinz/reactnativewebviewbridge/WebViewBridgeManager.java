@@ -54,7 +54,7 @@ public class WebViewBridgeManager extends ReactWebViewManager {
     }
 
     private void sendToBridge(WebView root, String message) {
-        String script = "const msgObj = JSON.parse('" + message + "'); window[msgObj.callback].call(null, msgObj.arg);";
+        String script = message;
         WebViewBridgeManager.evaluateJavascript(root, script);
     }
 
