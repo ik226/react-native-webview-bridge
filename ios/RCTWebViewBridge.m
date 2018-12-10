@@ -400,8 +400,8 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
         onError: null
       };
 
-      window.WebViewBridge = WebViewBridge;
-      window.ctandroid = { test: '1' };
+      // window.WebViewBridge = WebViewBridge;
+      window.ctandroid = WebViewBridge;
       //dispatch event
       customEvent.initEvent('WebViewBridge', true, true);
       doc.dispatchEvent(customEvent);
