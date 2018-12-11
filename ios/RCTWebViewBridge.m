@@ -109,7 +109,17 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 
 - (void)submitFromWeb:(NSString *)message
 {
+    NSString *format = NSStringMultiline(
+      (function(){
+        if (WebViewBridge && WebViewBridge.__push__) {
+          WebViewBridge.__push__('%@');
+        }
+      }());
+    );
+    NSString *quotedMessage = [message stringByReplacingOccurrencesOfString:@"'" withString:@"\\'"];
     
+    NSString *command = [NSString stringWithFormat: format, quotedMessage];
+    [_webView stringByEvaluatingJavaScriptFromString:command];
 }
 
 - (NSURL *)URL
