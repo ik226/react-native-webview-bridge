@@ -111,8 +111,8 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 {
     NSString *format = NSStringMultiline(
       (function(){
-        if (WebViewBridge && WebViewBridge.__push__) {
-          WebViewBridge.__push__('%@');
+        if (ctandroid && ctandroid.__push__) {
+          ctandroid.__push__('%@');
         }
       }());
     );
@@ -242,7 +242,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
   BOOL isJSNavigation = [request.URL.scheme isEqualToString:RCTJSNavigationScheme];
 
   if (!isJSNavigation && [request.URL.scheme isEqualToString:RCTWebViewBridgeSchema]) {
-    NSString* message = [webView stringByEvaluatingJavaScriptFromString:@"WebViewBridge.__fetch__()"];
+    NSString* message = [webView stringByEvaluatingJavaScriptFromString:@"ctandroid.__fetch__()"];
 
     NSMutableDictionary<NSString *, id> *onBridgeMessageEvent = [[NSMutableDictionary alloc] initWithDictionary:@{
       @"messages": [self stringArrayJsonToArray: message]
@@ -395,7 +395,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
         },
         //make sure message is string. because only string can be sent to native,
         //if you don't pass it as string, onError function will be called.
-        send: function (message) {
+        submitFromWeb: function (message) {
           if ('string' !== typeof message) {
             callFunc(WebViewBridge.onError, "message is type '" + typeof message + "', and it needs to be string");
             return;
