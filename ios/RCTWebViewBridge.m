@@ -90,36 +90,21 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 
 - (void)sendToBridge:(NSString *)message
 {
-  //we are warpping the send message in a function to make sure that if
-  //WebView is not injected, we don't crash the app.
-  NSString *format = NSStringMultiline(
-    (function(){
-      if (WebViewBridge && WebViewBridge.__push__) {
-        WebViewBridge.__push__('%@');
-      }
-    }());
-  );
-
-  // Escape singlequotes or messages containing ' will fail
-  NSString *quotedMessage = [message stringByReplacingOccurrencesOfString:@"'" withString:@"\\'"];
-
-  NSString *command = [NSString stringWithFormat: format, quotedMessage];
-  [_webView stringByEvaluatingJavaScriptFromString:command];
-}
-
-- (void)submitFromWeb:(NSString *)message
-{
-    NSString *format = NSStringMultiline(
-      (function(){
-        if (ctandroid && ctandroid.__push__) {
-          ctandroid.__push__('%@');
-        }
-      }());
-    );
-    NSString *quotedMessage = [message stringByReplacingOccurrencesOfString:@"'" withString:@"\\'"];
-    
-    NSString *command = [NSString stringWithFormat: format, quotedMessage];
-    [_webView stringByEvaluatingJavaScriptFromString:command];
+//  //we are warpping the send message in a function to make sure that if
+//  //WebView is not injected, we don't crash the app.
+//  NSString *format = NSStringMultiline(
+//    (function(){
+//      if (WebViewBridge && WebViewBridge.__push__) {
+//        WebViewBridge.__push__('%@');
+//      }
+//    }());
+//  );
+//
+//  // Escape singlequotes or messages containing ' will fail
+//  NSString *quotedMessage = [message stringByReplacingOccurrencesOfString:@"'" withString:@"\\'"];
+//
+//  NSString *command = [NSString stringWithFormat: format, quotedMessage];
+  [_webView stringByEvaluatingJavaScriptFromString:message];
 }
 
 - (NSURL *)URL
@@ -348,7 +333,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
       'use strict';
 
       //Make sure that if WebViewBridge already in scope we don't override it.
-      if (window.WebViewBridge) {
+      if (window.ctandroid) {
         return;
       }
 
