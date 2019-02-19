@@ -265,6 +265,15 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
     }
   }
 
+  if (![request.URL.scheme isEqual:@"http"] &&
+      ![request.URL.scheme isEqual:@"https"] &&
+      ![request.URL.scheme isEqual:@"about:blank"]) {
+      if ([[UIApplication sharedApplication]canOpenURL:request.URL]) {
+          [[UIApplication sharedApplication]openURL:request.URL];
+      }
+      return NO;
+  }
+
   // JS Navigation handler
   return !isJSNavigation;
 }
