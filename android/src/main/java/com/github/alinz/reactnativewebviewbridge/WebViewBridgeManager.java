@@ -10,6 +10,8 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
+import android.os.Build;
+import android.webkit.CookieManager;
 
 import com.facebook.common.logging.FLog;
 import com.facebook.react.bridge.Arguments;
