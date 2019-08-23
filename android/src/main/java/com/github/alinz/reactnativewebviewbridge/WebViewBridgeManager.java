@@ -63,6 +63,13 @@ public class WebViewBridgeManager extends ReactWebViewManager {
     protected WebView createViewInstance(ThemedReactContext reactContext) {
         WebView root = super.createViewInstance(reactContext);
         root.addJavascriptInterface(new JavascriptBridge(root), "ctandroid");
+
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            CookieManager cookieManager = CookieManager.getInstance();
+            cookieManager.setAcceptCookie(true);
+            cookieManager.setAcceptThirdPartyCookies(root, true);
+        }
+
         return root;
     }
 
