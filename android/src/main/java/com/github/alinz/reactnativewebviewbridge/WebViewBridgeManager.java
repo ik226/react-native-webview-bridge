@@ -193,8 +193,14 @@ public class WebViewBridgeManager extends ReactWebViewManager {
                     // App is installed.
                     context.startActivity(intent);
                 } else {
-                    String fallbackUrl = intent.getStringExtra("browser_fallback_url");
-                    intent = new Intent(Intent.ACTION_VIEW, Uri.parse(fallbackUrl));
+                    if (intent.hasExtra("browser_fallback_url")) {
+                        String fallbackUrl = intent.getStringExtra("browser_fallback_url");
+                        intent = new Intent(Intent.ACTION_VIEW, Uri.parse(fallbackUrl));
+                    } else if (intent.getPackage() != null) {
+                        String packageName = intent.getPackage();
+                        context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + packageName)));
+                        return;
+                    }
                 }
             } else {
                 // intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
