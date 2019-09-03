@@ -172,7 +172,7 @@ public class WebViewBridgeManager extends ReactWebViewManager {
             Intent intent = null;
 
             // URLs starting with 'intent://' require special handling.
-            if (url.startsWith(INTENT_URL_PREFIX)) {
+            if (url.startsWith(INTENT_URL_PREFIX) || url.contains("com.ahnlab.v3mobileplus") || url.contains("ahnlabv3mobileplus")) {
                 try {
                     intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
                 } catch (URISyntaxException e) {
