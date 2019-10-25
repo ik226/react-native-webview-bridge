@@ -6,18 +6,17 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
-import android.util.Log;
-import android.view.KeyEvent;
-import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.os.Build;
 import android.webkit.CookieManager;
 
 import com.facebook.common.logging.FLog;
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.ReactConstants;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.views.webview.ReactWebViewManager;
 import com.facebook.react.uimanager.annotations.ReactProp;
@@ -34,6 +33,7 @@ public class WebViewBridgeManager extends ReactWebViewManager {
     private static final String REACT_CLASS = "RCTWebViewBridge";
 
     public static final int COMMAND_SEND_TO_BRIDGE = 101;
+    public static final int COMMAND_SEND_TO_CAN_GO_BACK= 102;
     private static final String INTENT_URL_PREFIX = "intent://";
 
     @Override
@@ -57,6 +57,7 @@ public class WebViewBridgeManager extends ReactWebViewManager {
         Map<String, Integer> commandsMap = super.getCommandsMap();
 
         commandsMap.put("sendToBridge", COMMAND_SEND_TO_BRIDGE);
+        commandsMap.put("canGoBack", COMMAND_SEND_TO_CAN_GO_BACK);
 
         return commandsMap;
     }
@@ -82,6 +83,12 @@ public class WebViewBridgeManager extends ReactWebViewManager {
         switch (commandId) {
             case COMMAND_SEND_TO_BRIDGE:
                 sendToBridge(root, args.getString(0));
+                break;
+            case COMMAND_SEND_TO_CAN_GO_BACK:
+                WritableMap payload = Arguments.createMap();
+                payload.putBoolean("canGoBack", root.canGoBack());
+                ReactContext reactContext = (ReactContext) root.getContext();
+                reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("onGoBack", payload);
                 break;
             default:
                 //do nothing!!!!

@@ -79,6 +79,12 @@ var WebViewBridge = createReactClass({
       }
     });
 
+    DeviceEventEmitter.addListener('onGoBack', (event) => {
+      if (this.props.onGoBack) {
+        this.props.onGoBack(event);
+      }
+    });
+
     if (this.props.startInLoadingState) {
       this.setState({viewState: WebViewBridgeState.LOADING});
     }
@@ -175,6 +181,14 @@ var WebViewBridge = createReactClass({
       this.getWebViewBridgeHandle(),
       UIManager.RCTWebViewBridge.Commands.sendToBridge,
       [message]
+    );
+  },
+
+  canGoBack: function() {
+    UIManager.dispatchViewManagerCommand(
+      this.getWebViewBridgeHandle(),
+      UIManager.RCTWebViewBridge.Commands.canGoBack,
+      null
     );
   },
 
