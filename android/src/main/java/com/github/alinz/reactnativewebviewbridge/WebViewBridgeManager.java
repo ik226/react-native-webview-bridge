@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.webkit.WebView;
 import android.os.Build;
 import android.webkit.CookieManager;
+import android.util.Log;
 
 import com.facebook.common.logging.FLog;
 import com.facebook.react.bridge.Arguments;
@@ -187,6 +188,33 @@ public class WebViewBridgeManager extends ReactWebViewManager {
                 }
             }
 
+            if (url.startsWith(PaymentSchema.IAMPORT_APP_SCHEME)) {
+                // "iamportapp://https://pgcompany.com/foo/bar"와 같은 형태로 들어옴
+                String redirectURL = url.substring(PaymentSchema.IAMPORT_APP_SCHEME.length() + "://".length());
+                view.loadUrl(redirectURL);
+            }
+
+            if (!url.startsWith("http://") && !url.startsWith("https://") && !url.startsWith("javascript:")) {
+                try {
+                    intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME); // IntentURI처리
+                    Uri uri = Uri.parse(intent.getDataString());
+
+                    intent = new Intent(Intent.ACTION_VIEW, uri);
+                } catch (ActivityNotFoundException e) {
+                    if ( intent == null )   return false;
+                    String scheme = intent.getScheme();
+
+                    // 설치되지 않은 앱에 대해 사전 처리(Google Play이동 등 필요한 처리)
+                    if (PaymentSchema.ISP.equalsIgnoreCase(scheme)) {
+                        intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + PaymentSchema.PACKAGE_ISP));
+                    } else if (PaymentSchema.BANKPAY.equalsIgnoreCase(scheme)) {
+                        intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + PaymentSchema.PACKAGE_BANKPAY));
+                    }
+                    
+                    return false;
+                }
+            }
+
             if (intent != null) {
                 // This is needed to prevent security issue where non-exported activities from the same process can be started with intent:// URIs.
                 // See: T10607927/S136245
@@ -210,7 +238,6 @@ public class WebViewBridgeManager extends ReactWebViewManager {
                     }
                 }
             } else {
-                // intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                 view.loadUrl(url);
                 return;
             }
@@ -236,5 +263,6 @@ public class WebViewBridgeManager extends ReactWebViewManager {
             }
             return false;
         }
+
     }
 }
