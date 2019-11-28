@@ -196,22 +196,24 @@ public class WebViewBridgeManager extends ReactWebViewManager {
 
             if (!url.startsWith("http://") && !url.startsWith("https://") && !url.startsWith("javascript:")) {
                 try {
-                    intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME); // IntentURI처리
-                    Uri uri = Uri.parse(intent.getDataString());
-
-                    intent = new Intent(Intent.ACTION_VIEW, uri);
-                } catch (ActivityNotFoundException e) {
-                    if ( intent == null )   return false;
-                    String scheme = intent.getScheme();
-
-                    // 설치되지 않은 앱에 대해 사전 처리(Google Play이동 등 필요한 처리)
-                    if (PaymentSchema.ISP.equalsIgnoreCase(scheme)) {
-                        intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + PaymentSchema.PACKAGE_ISP));
-                    } else if (PaymentSchema.BANKPAY.equalsIgnoreCase(scheme)) {
-                        intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + PaymentSchema.PACKAGE_BANKPAY));
+                    try {
+                        intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME); // IntentURI처리
+                        Uri uri = Uri.parse(intent.getDataString());
+                        intent = new Intent(Intent.ACTION_VIEW, uri);
+                    } catch (URISyntaxException e) {
+                        FLog.e(ReactConstants.TAG, "Can't parse intent:// URI", e);
                     }
-                    
-                    return false;
+                } catch (ActivityNotFoundException e) {
+                    if ( intent != null ) {
+                        String scheme = intent.getScheme();
+
+                        // 설치되지 않은 앱에 대해 사전 처리(Google Play이동 등 필요한 처리)
+                        if (PaymentSchema.ISP.equalsIgnoreCase(scheme)) {
+                            intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + PaymentSchema.PACKAGE_ISP));
+                        } else if (PaymentSchema.BANKPAY.equalsIgnoreCase(scheme)) {
+                            intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + PaymentSchema.PACKAGE_BANKPAY));
+                        }
+                    }
                 }
             }
 
