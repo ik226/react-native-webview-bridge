@@ -186,34 +186,18 @@ public class WebViewBridgeManager extends ReactWebViewManager {
                 } catch (URISyntaxException e) {
                     FLog.e(ReactConstants.TAG, "Can't parse intent:// URI", e);
                 }
-            }
-
-            if (url.startsWith(PaymentSchema.IAMPORT_APP_SCHEME)) {
+            } else if (url.startsWith(PaymentSchema.IAMPORT_APP_SCHEME)) {
                 // "iamportapp://https://pgcompany.com/foo/bar"와 같은 형태로 들어옴
                 String redirectURL = url.substring(PaymentSchema.IAMPORT_APP_SCHEME.length() + "://".length());
                 view.loadUrl(redirectURL);
-            }
-
-            if (!url.startsWith("http://") && !url.startsWith("https://") && !url.startsWith("javascript:")) {
+                return;
+            } else if (!url.startsWith("http://") && !url.startsWith("https://") && !url.startsWith("javascript:")) {
                 try {
-                    try {
-                        intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME); // IntentURI처리
-                        Uri uri = Uri.parse(intent.getDataString());
-                        intent = new Intent(Intent.ACTION_VIEW, uri);
-                    } catch (URISyntaxException e) {
-                        FLog.e(ReactConstants.TAG, "Can't parse intent:// URI", e);
-                    }
-                } catch (ActivityNotFoundException e) {
-                    if ( intent != null ) {
-                        String scheme = intent.getScheme();
-
-                        // 설치되지 않은 앱에 대해 사전 처리(Google Play이동 등 필요한 처리)
-                        if (PaymentSchema.ISP.equalsIgnoreCase(scheme)) {
-                            intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + PaymentSchema.PACKAGE_ISP));
-                        } else if (PaymentSchema.BANKPAY.equalsIgnoreCase(scheme)) {
-                            intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + PaymentSchema.PACKAGE_BANKPAY));
-                        }
-                    }
+                    intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME); // IntentURI처리
+                    Uri uri = Uri.parse(intent.getDataString());
+                    intent = new Intent(Intent.ACTION_VIEW, uri);
+                } catch (URISyntaxException e) {
+                    FLog.e(ReactConstants.TAG, "Can't parse intent:// URI", e);
                 }
             }
 
@@ -228,7 +212,20 @@ public class WebViewBridgeManager extends ReactWebViewManager {
                 ResolveInfo info = packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
                 if (info != null) {
                     // App is installed.
-                    context.startActivity(intent);
+                    try {
+                        context.startActivity(intent);
+                    } catch (ActivityNotFoundException e) {
+                        String scheme = intent.getScheme();
+
+                        // 설치되지 않은 앱에 대해 사전 처리(Google Play이동 등 필요한 처리)
+                        if (PaymentSchema.ISP.equalsIgnoreCase(scheme)) {
+                            intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + PaymentSchema.PACKAGE_ISP));
+                        } else if (PaymentSchema.BANKPAY.equalsIgnoreCase(scheme)) {
+                            intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + PaymentSchema.PACKAGE_BANKPAY));
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 } else {
                     if (intent.hasExtra("browser_fallback_url")) {
                         String fallbackUrl = intent.getStringExtra("browser_fallback_url");
