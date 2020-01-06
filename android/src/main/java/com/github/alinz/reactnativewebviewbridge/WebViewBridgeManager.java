@@ -74,6 +74,9 @@ public class WebViewBridgeManager extends ReactWebViewManager {
             cookieManager.setAcceptThirdPartyCookies(root, true);
         }
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            WebView.setWebContentsDebuggingEnabled(true);
+        }
         return root;
     }
 
