@@ -74,6 +74,9 @@ public class WebViewBridgeManager extends ReactWebViewManager {
             cookieManager.setAcceptThirdPartyCookies(root, true);
         }
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            WebView.setWebContentsDebuggingEnabled(true);
+        }
         return root;
     }
 
@@ -190,7 +193,6 @@ public class WebViewBridgeManager extends ReactWebViewManager {
                 // "iamportapp://https://pgcompany.com/foo/bar"와 같은 형태로 들어옴
                 String redirectURL = url.substring(PaymentSchema.IAMPORT_APP_SCHEME.length() + "://".length());
                 view.loadUrl(redirectURL);
-                return;
             } else if (!url.startsWith("http://") && !url.startsWith("https://") && !url.startsWith("javascript:")) {
                 try {
                     intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME); // IntentURI처리
